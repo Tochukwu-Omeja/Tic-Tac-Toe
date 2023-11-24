@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 5px;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      border: 1px solid #ccc;
+      font-size: 2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .cell:hover {
+      background-color: #eee;
+    }
+
+    #dark-mode-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    #reset-button {
+      margin-top: 20px;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 10px 20px;
+      background-color: #fff;
+      color: black;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+      position: relative;
+      z-index: 1;
+    }
+
+    #reset-button:hover {
+      background-color: #eee;
+    }
+
+    @media (max-width: 600px) {
+      #board {
+        grid-template-columns: repeat(3, 80px);
+      }
+
+      .cell {
+        width: 80px;
+        height: 80px;
+      }
+    }
+
+    /* Dark mode styles */
+    body.dark-mode {
+      background-color: #333;
+      color: #fff;
+    }
+
+    body.dark-mode #board {
+      background-color: #444;
+    }
+
+    body.dark-mode .cell {
+      background-color: #555;
+      border-color: #666;
+      color: #fff;
+    }
+
+    body.dark-mode .cell:hover {
+      background-color: #666;
+    }
+
+
+    body.dark-mode #reset-button {
+      border-color: #666;
+      color: #fff;
+      background-color: #555;
+    }
+
+    body.dark-mode #reset-button:hover {
+      background-color: #666;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="dark-mode-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</div>
+  <div id="board"></div>
+  <div id="reset-button" onclick="resetGame()">Reset Game</div>
+
+  <script>
+    let currentPlayer = 'X';
+    let gameBoard = ['', '', '', '', '', '', '', '', ''];
+
+    function checkWinner() {
+      const winPatterns = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+        [0, 4, 8], [2, 4, 6]             // Diagonals
+      ];
+
+      for (const pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    function checkTie() {
+      return gameBoard.every(cell => cell !== '');
+    }
+
+    function handleClick(index) {
+      if (gameBoard[index] === '' && !checkWinner() && !checkTie()) {
+        gameBoard[index] = currentPlayer;
+        renderBoard();
+        if (checkWinner()) {
+          alert(`${currentPlayer} wins!`);
+        } else if (checkTie()) {
+          alert('It\'s a tie!');
+        } else {
+          currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        }
+      }
+    }
+
+    function renderBoard() {
+      const board = document.getElementById('board');
+      const fragment = document.createDocumentFragment();
+      gameBoard.forEach((value, index) => {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.textContent = value;
+        cell.addEventListener('click', () => handleClick(index));
+        fragment.appendChild(cell);
+      });
+      board.innerHTML = '';
+      board.appendChild(fragment);
+    }
+
+    function toggleDarkMode() {
+      const body = document.body;
+      body.classList.toggle('dark-mode');
+      updateDarkModeToggleText();
+    }
+
+    function updateDarkModeToggleText() {
+      const darkModeToggle = document.getElementById('dark-mode-toggle');
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      darkModeToggle.textContent = isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+
+    function resetGame() {
+      currentPlayer = 'X';
+      gameBoard = ['', '', '', '', '', '', '', '', ''];
+      renderBoard();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      renderBoard();
+    });
+  </script>
+</body>
+
+</html>
